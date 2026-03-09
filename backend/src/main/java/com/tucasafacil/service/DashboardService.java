@@ -2,6 +2,7 @@ package com.tucasafacil.service;
 
 import com.tucasafacil.dto.DashboardDto;
 import com.tucasafacil.entity.Property;
+import com.tucasafacil.entity.User;
 import com.tucasafacil.repository.PropertyRepository;
 import org.springframework.stereotype.Service;
 
@@ -13,13 +14,16 @@ import java.util.List;
 public class DashboardService {
 
     private final PropertyRepository propertyRepository;
+    private final CurrentUserService currentUserService;
 
-    public DashboardService(PropertyRepository propertyRepository) {
+    public DashboardService(PropertyRepository propertyRepository, CurrentUserService currentUserService) {
         this.propertyRepository = propertyRepository;
+        this.currentUserService = currentUserService;
     }
 
     public DashboardDto getDashboard() {
-        List<Property> properties = propertyRepository.findAll();
+        User currentUser = getCurrentUser();
+        List<Property> properties = propertyRepository.findByUser(currentUser);
 
         DashboardDto dto = new DashboardDto();
         dto.setTotalProperties((long) properties.size());
@@ -51,5 +55,9 @@ public class DashboardService {
         }
 
         return dto;
+    }
+
+    private User getCurrentUser() {
+        return currentUserService.getCurrentUserOrDemo();
     }
 }

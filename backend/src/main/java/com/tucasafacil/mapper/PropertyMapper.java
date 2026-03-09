@@ -1,6 +1,9 @@
 package com.tucasafacil.mapper;
 
+import com.tucasafacil.dto.PropertyImageDto;
 import com.tucasafacil.dto.PropertyDto;
+import com.tucasafacil.dto.PropertyRequirementDto;
+import com.tucasafacil.dto.ZoneAnalysisDto;
 import com.tucasafacil.entity.Property;
 import org.springframework.stereotype.Component;
 

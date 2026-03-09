@@ -3,6 +3,7 @@ package com.tucasafacil.entity;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -54,13 +55,17 @@ public class Property {
     private LocalDateTime updatedAt;
 
     @OneToMany(mappedBy = "property", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<PropertyRequirement> requirements;
+    private List<PropertyRequirement> requirements = new ArrayList<>();
 
     @OneToMany(mappedBy = "property", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ZoneAnalysis> zoneAnalyses;
+    private List<ZoneAnalysis> zoneAnalyses = new ArrayList<>();
 
     @OneToMany(mappedBy = "property", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<PropertyImage> images;
+    private List<PropertyImage> images = new ArrayList<>();
+
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
 
     // Getters y Setters
     public Long getId() { return id; }
@@ -168,12 +173,30 @@ public class Property {
     public LocalDateTime getUpdatedAt() { return updatedAt; }
     public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
 
-    public List<PropertyRequirement> getRequirements() { return requirements; }
-    public void setRequirements(List<PropertyRequirement> requirements) { this.requirements = requirements; }
+    public List<PropertyRequirement> getRequirements() {
+        if (requirements == null) requirements = new ArrayList<>();
+        return requirements;
+    }
+    public void setRequirements(List<PropertyRequirement> requirements) {
+        this.requirements = requirements != null ? requirements : new ArrayList<>();
+    }
 
-    public List<ZoneAnalysis> getZoneAnalyses() { return zoneAnalyses; }
-    public void setZoneAnalyses(List<ZoneAnalysis> zoneAnalyses) { this.zoneAnalyses = zoneAnalyses; }
+    public List<ZoneAnalysis> getZoneAnalyses() {
+        if (zoneAnalyses == null) zoneAnalyses = new ArrayList<>();
+        return zoneAnalyses;
+    }
+    public void setZoneAnalyses(List<ZoneAnalysis> zoneAnalyses) {
+        this.zoneAnalyses = zoneAnalyses != null ? zoneAnalyses : new ArrayList<>();
+    }
 
-    public List<PropertyImage> getImages() { return images; }
-    public void setImages(List<PropertyImage> images) { this.images = images; }
+    public List<PropertyImage> getImages() {
+        if (images == null) images = new ArrayList<>();
+        return images;
+    }
+    public void setImages(List<PropertyImage> images) {
+        this.images = images != null ? images : new ArrayList<>();
+    }
+
+    public User getUser() { return user; }
+    public void setUser(User user) { this.user = user; }
 }

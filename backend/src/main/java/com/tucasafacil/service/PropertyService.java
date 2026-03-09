@@ -1,7 +1,9 @@
 package com.tucasafacil.service;
 
 import com.tucasafacil.dto.PropertyDto;
+import com.tucasafacil.dto.MobilityInsightsDto;
 import com.tucasafacil.entity.Property;
+import com.tucasafacil.entity.User;
 import com.tucasafacil.exception.ExtractionException;
 import com.tucasafacil.exception.PropertyNotFoundException;
 import com.tucasafacil.mapper.PropertyMapper;
@@ -21,21 +23,37 @@ public class PropertyService {
     private final RequirementAnalyzer requirementAnalyzer;
     private final ZoneAnalysisService zoneAnalysisService;
     private final ScoringService scoringService;
+    private final CurrentUserService currentUserService;
+    private final MobilityService mobilityService;
 
     public PropertyService(PropertyRepository propertyRepository, PropertyMapper propertyMapper,
                            List<PropertyExtractor> extractors, RequirementAnalyzer requirementAnalyzer,
-                           ZoneAnalysisService zoneAnalysisService, ScoringService scoringService) {
+                           ZoneAnalysisService zoneAnalysisService, ScoringService scoringService,
+                           CurrentUserService currentUserService, MobilityService mobilityService) {
         this.propertyRepository = propertyRepository;
         this.propertyMapper = propertyMapper;
         this.extractors = extractors;
         this.requirementAnalyzer = requirementAnalyzer;
         this.zoneAnalysisService = zoneAnalysisService;
         this.scoringService = scoringService;
+        this.currentUserService = currentUserService;
+        this.mobilityService = mobilityService;
+    }
+
+    private User getCurrentUser() {
+        return currentUserService.getCurrentUserOrDemo();
     }
 
     public PropertyDto analyzeUrl(String url) {
-        if (propertyRepository.existsBySourceUrl(url)) {
-            throw new ExtractionException("URL ya analizada");
+        User user = getCurrentUser();
+
+        var existing = propertyRepository.findBySourceUrl(url);
+        if (existing.isPresent()) {
+            Property property = existing.get();
+            if (property.getUser() != null && property.getUser().getId().equals(user.getId())) {
+                return propertyMapper.toDto(property);
+            }
+            throw new ExtractionException("URL ya analizada por otro usuario");
         }
 
         PropertyExtractor extractor = extractors.stream()
@@ -45,6 +63,7 @@ public class PropertyService {
 
         try {
             Property property = extractor.extract(url);
+            property.setUser(user); // Asociar al usuario
 
             // Análisis de requisitos
             requirementAnalyzer.analyze(property);
@@ -63,27 +82,24 @@ public class PropertyService {
     }
 
     public List<PropertyDto> getAllProperties() {
-        return propertyRepository.findAll().stream()
+        User user = getCurrentUser();
+        return propertyRepository.findByUserId(user.getId()).stream()
                 .map(propertyMapper::toDto)
                 .collect(Collectors.toList());
     }
 
     public PropertyDto getPropertyById(Long id) {
-        Property property = propertyRepository.findById(id)
-                .orElseThrow(() -> new PropertyNotFoundException("Propiedad no encontrada"));
+        Property property = getPropertyForCurrentUser(id);
         return propertyMapper.toDto(property);
     }
 
     public void deleteProperty(Long id) {
-        if (!propertyRepository.existsById(id)) {
-            throw new PropertyNotFoundException("Propiedad no encontrada");
-        }
-        propertyRepository.deleteById(id);
+        Property property = getPropertyForCurrentUser(id);
+        propertyRepository.delete(property);
     }
 
     public PropertyDto reanalyzeProperty(Long id) {
-        Property property = propertyRepository.findById(id)
-                .orElseThrow(() -> new PropertyNotFoundException("Propiedad no encontrada"));
+        Property property = getPropertyForCurrentUser(id);
 
         // Re-ejecutar análisis
         requirementAnalyzer.analyze(property);
@@ -92,5 +108,19 @@ public class PropertyService {
 
         Property saved = propertyRepository.save(property);
         return propertyMapper.toDto(saved);
+    }
+
+    public MobilityInsightsDto getMobilityInsights(Long id, String destination) {
+        Property property = getPropertyForCurrentUser(id);
+        MobilityInsightsDto insights = mobilityService.buildInsights(property, destination);
+        propertyRepository.save(property);
+        return insights;
+    }
+
+    private Property getPropertyForCurrentUser(Long id) {
+        User user = getCurrentUser();
+        return propertyRepository.findById(id)
+                .filter(p -> p.getUser().getId().equals(user.getId()))
+                .orElseThrow(() -> new PropertyNotFoundException("Propiedad no encontrada"));
     }
 }

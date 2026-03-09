@@ -43,6 +43,14 @@ Proyecto para analizar viviendas de alquiler en Madrid y alrededores a partir de
 - `npm install`
 - `npm start`
 
+### EjecuciÃ³n local rÃ¡pida (Windows)
+- Levanta PostgreSQL en `localhost:5432` con:
+  - DB: `tucasafacil`
+  - Usuario: `tucasafacil`
+  - Password: `password`
+- Ejecuta desde la raÃ­z:
+  - `run-dev.bat`
+
 ## Funcionalidades
 
 - Análisis de URLs de anuncios inmobiliarios

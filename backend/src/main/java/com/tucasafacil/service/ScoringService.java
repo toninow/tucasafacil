@@ -2,7 +2,9 @@ package com.tucasafacil.service;
 
 import com.tucasafacil.dto.ScoringResult;
 import com.tucasafacil.entity.Property;
+import com.tucasafacil.entity.PropertyRequirement;
 import com.tucasafacil.entity.UserPreference;
+import com.tucasafacil.entity.ZoneAnalysis;
 import com.tucasafacil.repository.UserPreferenceRepository;
 import org.springframework.stereotype.Service;
 
@@ -20,7 +22,7 @@ public class ScoringService {
     }
 
     public ScoringResult calculateScore(Property property) {
-        UserPreference prefs = userPreferenceRepository.findFirstByOrderByIdAsc();
+        UserPreference prefs = userPreferenceRepository.findByUserId(property.getUser().getId()).orElse(null);
         if (prefs == null) {
             prefs = new UserPreference(); // Valores por defecto
             prefs.setMaxBudget(BigDecimal.valueOf(1500));

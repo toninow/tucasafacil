@@ -1,6 +1,8 @@
 package com.tucasafacil.controller;
 
 import com.tucasafacil.dto.AnalyzeUrlRequest;
+import com.tucasafacil.dto.MobilityInsightsDto;
+import com.tucasafacil.dto.MobilityRequest;
 import com.tucasafacil.dto.PropertyDto;
 import com.tucasafacil.service.PropertyService;
 import org.springframework.http.ResponseEntity;
@@ -39,6 +41,15 @@ public class PropertyController {
     @PostMapping("/{id}/reanalyze")
     public ResponseEntity<PropertyDto> reanalyzeProperty(@PathVariable Long id) {
         PropertyDto result = propertyService.reanalyzeProperty(id);
+        return ResponseEntity.ok(result);
+    }
+
+    @PostMapping("/{id}/mobility")
+    public ResponseEntity<MobilityInsightsDto> getMobilityInsights(
+            @PathVariable Long id,
+            @RequestBody(required = false) MobilityRequest request) {
+        String destination = request != null ? request.getDestination() : null;
+        MobilityInsightsDto result = propertyService.getMobilityInsights(id, destination);
         return ResponseEntity.ok(result);
     }
 

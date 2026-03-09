@@ -30,6 +30,7 @@ import { PropertyDto } from '../../shared/models/property.model';
           <th mat-header-cell *matHeaderCellDef>Acciones</th>
           <td mat-cell *matCellDef="let property">
             <button mat-button (click)="viewDetail(property.id)">Ver</button>
+            <button mat-button color="warn" (click)="deleteProperty(property.id)">Eliminar</button>
           </td>
         </ng-container>
         <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
@@ -55,5 +56,19 @@ export class PropertyListComponent implements OnInit {
 
   viewDetail(id: number): void {
     this.router.navigate(['/properties', id]);
+  }
+
+  deleteProperty(id: number): void {
+    const confirmed = confirm('¿Seguro que quieres eliminar esta propiedad analizada?');
+    if (!confirmed) return;
+
+    this.apiService.deleteProperty(id).subscribe({
+      next: () => {
+        this.properties = this.properties.filter(p => p.id !== id);
+      },
+      error: () => {
+        alert('No se pudo eliminar la propiedad.');
+      }
+    });
   }
 }

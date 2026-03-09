@@ -19,6 +19,9 @@ public class ExtractionLog {
     private String message;
     private String rawDataSnippet;
     private LocalDateTime createdAt;
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
 
     // Getters y Setters
     public Long getId() { return id; }
@@ -41,4 +44,7 @@ public class ExtractionLog {
 
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+
+    public User getUser() { return user; }
+    public void setUser(User user) { this.user = user; }
 }

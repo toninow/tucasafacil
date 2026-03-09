@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { PropertyDto } from '../shared/models/property.model';
 import { DashboardDto } from '../shared/models/dashboard.model';
 import { UserPreference } from '../shared/models/user-preference.model';
+import { MobilityInsightsDto } from '../shared/models/mobility.model';
 
 @Injectable({
   providedIn: 'root'
@@ -28,6 +29,12 @@ export class ApiService {
 
   reanalyzeProperty(id: number): Observable<PropertyDto> {
     return this.http.post<PropertyDto>(`${this.baseUrl}/properties/${id}/reanalyze`, {});
+  }
+
+  getMobilityInsights(propertyId: number, destination?: string): Observable<MobilityInsightsDto> {
+    return this.http.post<MobilityInsightsDto>(`${this.baseUrl}/properties/${propertyId}/mobility`, {
+      destination: destination || null
+    });
   }
 
   deleteProperty(id: number): Observable<void> {

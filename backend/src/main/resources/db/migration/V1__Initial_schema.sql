@@ -40,7 +40,8 @@ CREATE TABLE property (
     requirement_score DECIMAL(5,2),
     extracted_at TIMESTAMP,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    user_id INTEGER -- Añadido para multiusuario
 );
 
 CREATE TABLE property_requirement (
@@ -99,7 +100,8 @@ CREATE TABLE user_preference (
     accepts_insurance BOOLEAN DEFAULT TRUE,
     reference_latitude DECIMAL(9,6),
     reference_longitude DECIMAL(9,6),
-    scoring_weights_json TEXT -- JSON con pesos
+    scoring_weights_json TEXT, -- JSON con pesos
+    user_id INTEGER -- Añadido para multiusuario
 );
 
 CREATE TABLE extraction_log (
@@ -109,7 +111,8 @@ CREATE TABLE extraction_log (
     status VARCHAR(20) NOT NULL, -- SUCCESS, ERROR, etc.
     message TEXT,
     raw_data_snippet TEXT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    user_id INTEGER -- Añadido para multiusuario
 );
 
 -- Insertar portales iniciales

@@ -24,7 +24,10 @@ public class UserPreference {
     private Boolean acceptsInsurance = true;
     private BigDecimal referenceLatitude;
     private BigDecimal referenceLongitude;
-    private String scoringWeightsJson; // JSON
+    private String scoringWeightsJson;
+    @ManyToOne
+    @JoinColumn(name = "user_id", unique = true)
+    private User user;
 
     // Getters y Setters
     public Long getId() { return id; }
@@ -71,4 +74,7 @@ public class UserPreference {
 
     public String getScoringWeightsJson() { return scoringWeightsJson; }
     public void setScoringWeightsJson(String scoringWeightsJson) { this.scoringWeightsJson = scoringWeightsJson; }
+
+    public User getUser() { return user; }
+    public void setUser(User user) { this.user = user; }
 }
